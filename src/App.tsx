@@ -13,6 +13,7 @@ import { ContactPage } from './pages/ContactPage';
 import rawOpportunities from './data/opportunities.json';
 import { Opportunity } from './types';
 import { watchPublished } from './lib/submissions';
+import { activeOpportunities } from './lib/deadlines';
 
 const INITIAL_OPPORTUNITIES: Opportunity[] = rawOpportunities as Opportunity[];
 
@@ -21,12 +22,19 @@ function MainAppContent() {
 
   const [customOpportunities, setCustomOpportunities] = useState<Opportunity[]>([]);
   const [catalogError, setCatalogError] = useState(false);
+  const [clock, setClock] = useState(() => new Date());
+  useEffect(() => {
+    const refresh = () => setClock(new Date());
+    const timer = window.setInterval(refresh, 60_000);
+    window.addEventListener('focus', refresh);
+    return () => { window.clearInterval(timer); window.removeEventListener('focus', refresh); };
+  }, []);
   useEffect(() => watchPublished(ops => { setCustomOpportunities(ops); setCatalogError(false); }, () => setCatalogError(true)), []);
 
   // Combined opportunities pool
   const allOpportunities = useMemo(() => {
-    return [...customOpportunities, ...INITIAL_OPPORTUNITIES];
-  }, [customOpportunities]);
+    return activeOpportunities([...customOpportunities, ...INITIAL_OPPORTUNITIES], clock);
+  }, [customOpportunities, clock]);
 
   // Scope count calculations
   const moroccoCount = useMemo(() => allOpportunities.filter((x) => x.scope === 'داخل المغرب').length, [allOpportunities]);

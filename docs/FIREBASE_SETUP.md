@@ -1,6 +1,14 @@
 # Firebase integration and activation
 
-This branch preserves the original 25-record JSON catalog and visual system. It replaces browser-only moderation with Firestore submissions, Firebase email/password administrator sign-in, and a two-step approval/publication workflow. No Firebase resources, production rules, billing or website deployments have been changed by these source edits.
+This branch preserves the original 25-record JSON catalog and visual system. It replaces browser-only moderation with Firestore submissions, Firebase email/password administrator sign-in, and a two-step approval/publication workflow. Source changes and live activation are tracked separately below.
+
+## Activation progress
+
+The owner approved accepting Firebase terms and creating the database in Madrid. Project `forsaconnect-e019d` and its Standard `(default)` Firestore database in `europe-southwest1` now exist on Spark ($0/month), with optional Analytics, Developer Program enrollment, paid backups and billing left disabled. The database was initialized in production mode (deny all client access). Email/Password and Anonymous Authentication were enabled, and the existing web client registered. Public web configuration was set in the private development environment, never administrator credentials. Reviewed application rules, administrator provisioning, live workflow validation, unattended ingestion and public Hosting publication remain pending.
+
+## Automatic deadline visibility
+
+The public catalog hides listings with expired, unambiguous deadlines, without deleting source records or database documents. ISO dates (`YYYY-MM-DD`, optionally followed by a parenthetical note without numbers) remain visible through that day in Africa/Casablanca. Exact ISO timestamps must include a timezone (`Z` or numeric offset). Other text, invalid dates, and unclear hours/timezones require manual review and are never guessed. The catalog refreshes the clock every minute and on window focus. This applies to bundled and Firestore listings, home counts, activities, search and detail routes. An accurate device clock and current timezone data are required. This is presentation filtering, not a server-side deletion or access restriction.
 
 ## Before activation
 
@@ -21,7 +29,7 @@ Use the existing ForsaConnect Firebase project if one exists. No Firebase projec
 - `publishedOpportunities/{id}`: public projection without submitter UID or internal review notes. All clients are denied editing and deleting published records in this first increment. Rejected submissions remain private.
 - Publication does not claim independently verified registration availability. Original source checking remains a human responsibility.
 - The original research catalog is bundled and remains available when Firebase is unconfigured or unreachable. Failed submissions retain entered fields and never show success. Old simulated localStorage approvals are deliberately not imported into the public catalog.
-- Admin queries show up to 200 submissions in the selected state; the public subscription retrieves up to 500 published additions. Pagination, withdrawal of published items, history of every review decision, automatic expiry, and migration of old local drafts are future work. Expiry is not automated because the existing catalog contains free-text deadlines.
+- Admin queries show up to 200 submissions in the selected state; the public subscription retrieves up to 500 published additions. Pagination, withdrawal of published items, history of every review decision, and migration of old local drafts are future work. Automatic deadline visibility is described above; uncertain free-text deadlines still need review.
 
 ## Validation
 

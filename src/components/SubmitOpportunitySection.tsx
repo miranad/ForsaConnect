@@ -209,9 +209,11 @@ export const SubmitOpportunitySection: React.FC = () => {
                     type="text"
                     value={deadline}
                     onChange={(e) => setDeadline(e.target.value)}
-                    placeholder="مثال: 15 نوفمبر 2026 أو مستمر"
+                    placeholder="مثال: 2026-11-15 أو مستمر"
+                    aria-describedby="deadline-help"
                     className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#0F2840] text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1667A5]"
                   />
+                  <p id="deadline-help" className="mt-2 text-xs text-slate-600 dark:text-slate-300">اكتب التاريخ بصيغة سنة-شهر-يوم لإخفاء الفرصة تلقائياً بعد انتهاء اليوم بتوقيت المغرب. إذا حدد المصدر ساعة إغلاق، اذكر الساعة والمنطقة الزمنية كما وردتا في المصدر للمراجعة.</p>
                 </div>
 
                 <div>
