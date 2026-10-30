@@ -3,6 +3,7 @@ import { Sparkles, Compass, PlusCircle, ArrowLeft, ShieldCheck, CheckCircle2, Us
 import { Opportunity } from '../types';
 import { useRouter } from '../context/RouterContext';
 import { OpportunityCard } from '../components/OpportunityCard';
+import { OrganizationIdentity, SCOUT_ORGANIZATION } from '../components/OrganizationIdentity';
 
 interface HomePageProps {
   opportunities: Opportunity[];
@@ -21,6 +22,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
   // Preview 6 featured opportunities on the home page
   const featuredOpportunities = opportunities.slice(0, 6);
+  const organizationActivities = opportunities.filter(op => op.organization.includes(SCOUT_ORGANIZATION) || op.organization.toLowerCase().includes('voluntary scout organization'));
 
   return (
     <div className="space-y-16 sm:space-y-24 pb-16">
@@ -51,7 +53,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                   className="inline-flex items-center gap-2 bg-[#259A6A] hover:bg-[#1E7D56] text-white px-6 py-3.5 rounded-xl font-bold text-base shadow-lg shadow-emerald-950/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <Compass className="w-5 h-5" />
-                  <span>تصفح دليل الـ 25 فرصة</span>
+                  <span>تصفح دليل الفرص</span>
                 </button>
                 <button
                   type="button"
@@ -67,7 +69,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               <div className="pt-2 flex items-start gap-2.5 text-xs text-slate-500 dark:text-slate-400">
                 <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5 text-[#1667A5]" />
                 <span>
-                  جميع الفرص المعروضة تم جمعها من مصادر أصلية مؤرخة بـ <b>29 أكتوبر 2026</b>. لا تمثل المنصة الجهات الناشرة ويُنصح بالتحقق المباشر من استمرار فتح باب التسجيل عبر الرابط الرسمي.
+                  تعرّف على تفاصيل الفرص وشروطها عبر مصادرها الرسمية. يُرجى التأكد من استمرار فتح باب التسجيل لدى الجهة المنظمة.
                 </span>
               </div>
             </div>
@@ -90,13 +92,22 @@ export const HomePage: React.FC<HomePageProps> = ({
                     «طريقك نحو الفرص»
                   </p>
                   <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
-                    مبادرة كشفية شبابية من «كشافة الأذكياء»
+                    مبادرة فريق «كشافة الأذكياء»
                   </p>
                 </div>
+                <div className="pt-5 border-t border-slate-200 dark:border-[#23486A]"><OrganizationIdentity /></div>
               </div>
             </div>
           </div>
         </div>
+      </section>
+
+      <section aria-labelledby="organization-activities-title" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-right space-y-6">
+        <div className="flex items-start justify-between gap-5 flex-wrap">
+          <div><h2 id="organization-activities-title" className="text-2xl sm:text-3xl font-black font-heading text-[#0F2840] dark:text-white">أنشطة منظمة الكشاف التطوعي</h2><p className="mt-3 text-sm text-slate-600 dark:text-slate-300">تعرّف على أنشطة المنظمة وورشاتها ومبادراتها التطوعية. تُضاف الأنشطة الجديدة بعد مراجعتها واعتماد نشرها.</p></div>
+          <button type="button" onClick={() => navigate('submit')} className="px-5 py-3 bg-[#1667A5] text-white rounded-xl text-sm font-bold">اقترح نشاطاً للمنظمة</button>
+        </div>
+        {organizationActivities.length > 0 ? <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">{organizationActivities.slice(0, 6).map(op => <OpportunityCard key={op.id} opportunity={op} onOpenDetails={item => navigate('opportunity-detail', item.id)} />)}</div> : <p className="p-6 sm:p-8 bg-white dark:bg-[#15344F] rounded-3xl border border-slate-200 dark:border-[#23486A] text-sm text-slate-600 dark:text-slate-300">ستظهر هنا أنشطة المنظمة عند اعتماد أول إعلان. يمكنك حالياً تصفح الفرص الأخرى في الدليل.</p>}
       </section>
 
       {/* Scope Cards Strip (Directly Navigable) */}
@@ -168,7 +179,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               أحدث الفرص الشبابية الموثقة
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-              عينة من 6 فرص مختارة. يمكنك استعراض كافة السجلات الـ 25 والبحث المتقدم في صفحة الدليل المخصصة.
+              فرص مختارة من الدليل. استكشف بقية الفرص باستخدام البحث والفلاتر.
             </p>
           </div>
 
@@ -177,7 +188,7 @@ export const HomePage: React.FC<HomePageProps> = ({
             onClick={() => navigate('opportunities')}
             className="inline-flex items-center gap-2 bg-[#1667A5] hover:bg-[#125386] text-white px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-sm transition-all hover:scale-[1.02]"
           >
-            <span>فتح الدليل الكامل (25 فرصة)</span>
+            <span>فتح دليل الفرص</span>
             <ArrowLeft className="w-4 h-4" />
           </button>
         </div>

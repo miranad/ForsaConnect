@@ -84,7 +84,7 @@ export const OpportunitiesPage: React.FC<OpportunitiesPageProps> = ({
             فرص موثقة المصدر: داخل المغرب، خارجه، وعن بعد
           </h1>
           <p className="mt-2 text-sm sm:text-base text-slate-600 dark:text-slate-300 max-w-3xl leading-relaxed">
-            استعرض {opportunities.length} فرصة وبرنامج تم جمعها وتوثيقها من مصادرها الرسمية. اختر أي فرصة للدخول إلى صفحتها التفصيلية والشروط.
+            استكشف فرص التطوع والورشات والمنح والتكوين والأنشطة من مصادرها الرسمية. اختر فرصة للاطلاع على تفاصيلها وشروطها.
           </p>
         </div>
 
@@ -93,10 +93,10 @@ export const OpportunitiesPage: React.FC<OpportunitiesPageProps> = ({
           <ShieldCheck className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
           <div>
             <p className="font-bold">
-              تاريخ مراجعة المصادر في الملف: 29-10-2026. وجود رابط رسمي لا يعني أن باب التسجيل ما زال مفتوحاً أو أن المقاعد متاحة؛ يُرجى التأكد من الجهة المنظمة قبل التقديم.
+              وجود رابط رسمي لا يعني أن باب التسجيل ما زال مفتوحاً أو أن المقاعد متاحة؛ يُرجى التأكد من الجهة المنظمة قبل التقديم.
             </p>
             <p className="text-xs text-amber-800 dark:text-amber-300 mt-1">
-              لا توجد فرص منح في الملف البحثي الحالي، ولذلك لا يظهر مرشح «منح» حتى تُضاف سجلات رسمية معتمدة.
+              تختلف شروط الأهلية والدعم والتسجيل حسب البرنامج؛ اطلع على التفاصيل قبل التقديم.
             </p>
           </div>
         </div>

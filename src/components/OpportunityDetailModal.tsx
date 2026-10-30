@@ -97,7 +97,6 @@ export const OpportunityDetailModal: React.FC<OpportunityDetailModalProps> = ({ 
                 <span className={statusStyle.text}>حالة التوثيق: {statusStyle.label}</span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-300 mt-1">
-                تاريخ مراجعة الرابط الرسمي: <span className="font-bold text-slate-800 dark:text-slate-200">{opportunity.verified_on}</span>. 
                 وجود المصدر لا يعني بالضرورة استمرار فتح باب التقديم اليوم؛ يرجى مراجعة الموقع الرسمي للجهة للتأكد من المقاعد.
               </p>
             </div>

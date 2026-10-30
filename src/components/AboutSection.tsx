@@ -1,4 +1,5 @@
 import React from 'react';
+import { OrganizationIdentity } from './OrganizationIdentity';
 import { Users, Target, HeartHandshake, Award, AlertCircle, CheckCircle2, Clock } from 'lucide-react';
 
 export const AboutSection: React.FC = () => {
@@ -15,9 +16,11 @@ export const AboutSection: React.FC = () => {
             لماذا ForsaConnect؟
           </h2>
           <p className="mt-3 text-base text-slate-600 dark:text-slate-300 leading-relaxed">
-            مبادرة شبابية غير ربحية انطلقت من ورشة كشفية لفريق «كشافة الأذكياء» (Smart Scouts)، بهدف سد فجوة المعلومة وتسهيل وصول الشباب المغربي إلى فرص التطوع والتكوين والمنح الحقيقية.
+            مشروع شبابي غير ربحي تابع لمنظمة الكشاف التطوعي، انطلق من ورشة كشفية لفريق «كشافة الأذكياء» (Smart Scouts)، بهدف سد فجوة المعلومة وتسهيل وصول الشباب المغربي إلى فرص التطوع والتكوين والمنح الحقيقية.
           </p>
         </div>
+
+        <div className="mb-10 p-6 rounded-3xl bg-white dark:bg-[#15344F] border border-slate-200 dark:border-[#23486A]"><OrganizationIdentity /><p className="mt-4 text-sm text-slate-600 dark:text-slate-300">تضم المنصة أيضاً أنشطة المنظمة وورشاتها ومبادراتها، وتُضاف إعلاناتها الجديدة عبر مسار الاقتراح والمراجعة والاعتماد.</p></div>
 
         {/* Scout Survey Findings (Exact 7-participant sample from Spec) */}
         <div className="mb-14">
@@ -73,41 +76,11 @@ export const AboutSection: React.FC = () => {
           </p>
         </div>
 
-        {/* What is completed vs Simulated */}
-        <div className="bg-white dark:bg-[#15344F] rounded-3xl p-6 sm:p-8 border border-slate-200/90 dark:border-[#23486A] shadow-sm">
-          <h3 className="text-xl font-bold font-heading text-[#0F2840] dark:text-white mb-6">
-            مصفوفة الشفافية: ما تم إنجازه مقابل ما يلزم للمرحلة السحابية
-          </h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs sm:text-sm">
-            {/* Completed */}
-            <div className="space-y-3">
-              <h4 className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4" />
-                <span>الميزات المكتملة في المعاينة التفاعلية (جاهزة الآن):</span>
-              </h4>
-              <ul className="space-y-2 text-slate-600 dark:text-slate-300 list-disc list-inside">
-                <li>استيراد الـ 25 فرصة الحقيقية كاملة بنطاقاتها (17 المغرب، 3 دولية، 5 عن بعد).</li>
-                <li>تصفية حية حسب النطاق، الفئة، والمدينة، مع محرك بحث فوري بالأحرف العربية.</li>
-                <li>نافذة تفاصيل متكاملة مع إيضاح الشروط، التكاليف، طريقة التسجيل، والروابط الرسمية.</li>
-                <li>نموذج اقتراح فرصة مع فحص العناوين، بروتوكول https://، وموافقة حماية القاصرين.</li>
-                <li>لوحة إشراف تجريبية تتيح فحص واعتماد المسودات وإظهارها فوراً في الدليل.</li>
-              </ul>
-            </div>
-
-            {/* Pending Cloud Deployment */}
-            <div className="space-y-3">
-              <h4 className="font-bold text-sky-600 dark:text-sky-400 flex items-center gap-2">
-                <Clock className="w-4 h-4" />
-                <span>المرحلة السحابية (تتطلب مصادقتك لتفعيل Firebase):</span>
-              </h4>
-              <ul className="space-y-2 text-slate-600 dark:text-slate-300 list-disc list-inside">
-                <li>ربط قاعدة بيانات Google Firebase Firestore لتخزين ومزامنة البيانات عبر مختلف الأجهزة.</li>
-                <li>مصادقة المشرفين عبر Google Sign-In مع حماية الخادم (Custom Claims).</li>
-                <li>نشر قواعد أمان Firestore Rules تمنع غير المشرفين من نشر أي فرصة قبل المراجعة.</li>
-                <li>نظام التنبيهات وإشعار أصحاب المقترحات عند قبول أو رفض الفرصة.</li>
-              </ul>
-            </div>
+        <div className="bg-white dark:bg-[#15344F] rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-[#23486A] shadow-sm">
+          <h3 className="text-xl font-bold font-heading text-[#0F2840] dark:text-white mb-6">المصداقية وسلامة المشاركة</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-slate-600 dark:text-slate-300">
+            <div><h4 className="font-bold text-[#259A6A] mb-3">من المصادر الرسمية</h4><p>تجمع المنصة فرص التطوع والورشات والمنح والزمالات والتدريب والدورات والأنشطة الشبابية، مع روابط مباشرة للجهات المنظمة للاطلاع على التفاصيل والتقديم.</p></div>
+            <div><h4 className="font-bold text-[#1667A5] dark:text-sky-300 mb-3">مراجعة قبل النشر</h4><p>تخضع المقترحات للمراجعة قبل ظهورها في الدليل. لا تشارك بيانات شخصية حساسة، وتأكد من شروط الأهلية وآجال التسجيل لدى الجهة المنظمة.</p></div>
           </div>
         </div>
       </div>

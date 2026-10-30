@@ -1,5 +1,6 @@
 import React from 'react';
 import { Compass, ShieldCheck, Heart, ArrowUp } from 'lucide-react';
+import { OrganizationIdentity } from './OrganizationIdentity';
 import { useRouter } from '../context/RouterContext';
 
 export const Footer: React.FC = () => {
@@ -34,8 +35,9 @@ export const Footer: React.FC = () => {
               «طريقك نحو الفرص» · منصة شبابية غير ربحية تجمع فرص التطوع، التكوين، المنح، والأنشطة في المغرب وخارجه من مصادرها الرسمية الموثوقة.
             </p>
             <p className="text-xs text-slate-500">
-              انطلقت كمبادرة كشفية من فريق «كشافة الأذكياء» (Smart Scouts) لدعم وتمكين الشباب المغربي.
+              مشروع تابع لمنظمة الكشاف التطوعي، انطلق بمبادرة فريق «كشافة الأذكياء» (Smart Scouts) لدعم وتمكين الشباب المغربي.
             </p>
+            <OrganizationIdentity dark />
           </div>
 
           {/* Quick Links (3 Cols) */}
@@ -57,7 +59,7 @@ export const Footer: React.FC = () => {
                   onClick={() => navigate('opportunities')}
                   className="hover:text-emerald-400 transition-colors"
                 >
-                  دليل الـ 25 فرصة الموثقة
+                  دليل الفرص
                 </button>
               </li>
               <li>
@@ -75,7 +77,7 @@ export const Footer: React.FC = () => {
                   onClick={() => navigate('admin')}
                   className="hover:text-emerald-400 transition-colors"
                 >
-                  لوحة الإشراف والمراجعة (تجريبية)
+                  لوحة الإشراف والمراجعة
                 </button>
               </li>
               <li>
@@ -118,7 +120,7 @@ export const Footer: React.FC = () => {
               منصة ForsaConnect لا تمثل المنظمات الناشرة ولا تضمن قبول طلبك. جميع الروابط تقود إلى المواقع الرسمية للجهات المعلنة.
             </p>
             <p className="leading-relaxed text-slate-500">
-              تاريخ مراجعة بيانات البحث: <b>29 أكتوبر 2026</b>. يرجى التحقق المستقل من توفر المقاعد ومواعيد التسجيل الحالية قبل إرسال طلبك.
+              يرجى التأكد من توفر المقاعد ومواعيد التسجيل الحالية لدى الجهة المنظمة قبل إرسال طلبك.
             </p>
           </div>
         </div>

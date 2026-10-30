@@ -23,3 +23,7 @@ Thumbs.db
 .aistudio/
 public/assets/aistudio/
 ForsaConnect_GitHub_Fixes_2026-10-30/
+
+# Local QA and emulator artifacts
+qa-preview.html
+.firebase/

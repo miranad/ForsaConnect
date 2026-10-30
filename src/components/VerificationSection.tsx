@@ -58,10 +58,10 @@ export const VerificationSection: React.FC = () => {
               <Calendar className="w-5 h-5" />
             </div>
             <h3 className="text-base font-bold font-heading text-[#0F2840] dark:text-white mb-2">
-              تاريخ المراجعة مقابل الحالة اللحظية
+              التأكد من توفر التسجيل
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-              جميع السجلات الـ 25 الحالية تم تدقيق مصادرها في <b>29 أكتوبر 2026</b>. لا ندعي أن التسجيل متاح تلقائياً اليوم دون أن تقوم بزيارة الرابط والتأكد من الجهة المنظمة.
+              وجود إعلان رسمي لا يضمن بقاء التسجيل مفتوحاً أو توفر المقاعد. تأكد من التفاصيل مباشرة لدى الجهة المنظمة قبل التقديم.
             </p>
           </div>
 

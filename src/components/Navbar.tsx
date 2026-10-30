@@ -14,7 +14,7 @@ export const Navbar: React.FC<NavbarProps> = ({ draftCount }) => {
     { id: 'home' as PageType, label: 'الرئيسية', icon: Home },
     { id: 'opportunities' as PageType, label: 'دليل الفرص', icon: Compass },
     { id: 'submit' as PageType, label: 'شارك فرصة', icon: PlusCircle, badge: draftCount > 0 ? draftCount : undefined },
-    { id: 'admin' as PageType, label: 'لوحة الإشراف (تجريبية)', icon: ShieldCheck },
+    { id: 'admin' as PageType, label: 'لوحة الإشراف', icon: ShieldCheck },
     { id: 'verification' as PageType, label: 'عن التحقق', icon: HelpCircle },
     { id: 'about' as PageType, label: 'من نحن', icon: Users },
     { id: 'contact' as PageType, label: 'تواصل وشراكات', icon: Mail },
@@ -35,7 +35,7 @@ export const Navbar: React.FC<NavbarProps> = ({ draftCount }) => {
             النسخة 3 المعتمدة
           </span>
           <span className="text-white/60">|</span>
-          <span>بيانات بحثية موثقة من مصادر أصلية (تاريخ المراجعة: 29 أكتوبر 2026).</span>
+          <span>فرص تطوع وتكوين وأنشطة للشباب من مصادرها الرسمية.</span>
           <span className="hidden sm:inline text-white/60">|</span>
           <span className="hidden sm:inline text-white/90">يُرجى مراجعة الموقع الرسمي قبل إرسال طلبك.</span>
         </div>

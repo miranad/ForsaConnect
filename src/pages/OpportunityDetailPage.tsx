@@ -133,9 +133,9 @@ export const OpportunityDetailPage: React.FC<OpportunityDetailPageProps> = ({ op
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
                   {opportunity.isCustom ? (
-                    <>تاريخ إدخال الاقتراح التجريبي: <span className="font-bold text-slate-800 dark:text-slate-200">{opportunity.verified_on}</span>. لم يتم التحقق بشكل مستقل من هذا الاقتراح أو من فتح التسجيل.</>
+                    <>اعتمد المشرف نشر هذا الاقتراح. يرجى التأكد من استمرار فتح التسجيل لدى الجهة المنظمة.</>
                   ) : (
-                    <>تاريخ مراجعة المصدر: <span className="font-bold text-slate-800 dark:text-slate-200">{opportunity.verified_on}</span>. وجود رابط رسمي لا يعني استمرار فتح التسجيل؛ يُرجى التأكد من الجهة المنظمة.</>
+                    <>وجود رابط رسمي لا يعني استمرار فتح التسجيل؛ يُرجى التأكد من الجهة المنظمة.</>
                   )}
                 </p>
               </div>

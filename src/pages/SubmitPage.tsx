@@ -1,22 +1,9 @@
 import React from 'react';
-import { Home, PlusCircle } from 'lucide-react';
-import { SubmissionDraft } from '../types';
+import { Home } from 'lucide-react';
 import { useRouter } from '../context/RouterContext';
 import { SubmitOpportunitySection } from '../components/SubmitOpportunitySection';
 
-interface SubmitPageProps {
-  drafts: SubmissionDraft[];
-  onAddDraft: (draft: SubmissionDraft) => void;
-  onDeleteDraft: (id: string) => void;
-  onSimulateApprove: (draft: SubmissionDraft) => void;
-}
-
-export const SubmitPage: React.FC<SubmitPageProps> = ({
-  drafts,
-  onAddDraft,
-  onDeleteDraft,
-  onSimulateApprove,
-}) => {
+export const SubmitPage: React.FC = () => {
   const { navigate } = useRouter();
 
   return (
@@ -36,12 +23,7 @@ export const SubmitPage: React.FC<SubmitPageProps> = ({
           <span className="text-slate-800 dark:text-slate-200 font-bold">اقترح فرصة للشباب</span>
         </nav>
 
-        <SubmitOpportunitySection
-          drafts={drafts}
-          onAddDraft={onAddDraft}
-          onDeleteDraft={onDeleteDraft}
-          onSimulateApprove={onSimulateApprove}
-        />
+        <SubmitOpportunitySection />
       </div>
     </div>
   );

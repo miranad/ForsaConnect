@@ -1,21 +1,13 @@
 import React, { useState } from 'react';
-import { PlusCircle, ShieldCheck, CheckCircle2, AlertTriangle, Trash2, ArrowRight, ExternalLink, Info, Lock } from 'lucide-react';
+import { PlusCircle, ShieldCheck, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { ScopeType, SubmissionDraft } from '../types';
 import { asOfficialUrl } from '../lib/catalog';
+import { submitOpportunity } from '../lib/submissions';
+import { firebaseConfigured } from '../lib/firebase';
+import { SCOUT_ORGANIZATION } from './OrganizationIdentity';
 
-interface SubmitOpportunitySectionProps {
-  drafts: SubmissionDraft[];
-  onAddDraft: (draft: SubmissionDraft) => void;
-  onDeleteDraft: (id: string) => void;
-  onSimulateApprove?: (draft: SubmissionDraft) => void;
-}
-
-export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> = ({
-  drafts,
-  onAddDraft,
-  onDeleteDraft,
-  onSimulateApprove,
-}) => {
+export const SubmitOpportunitySection: React.FC = () => {
+  const [sending, setSending] = useState(false);
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('تطوع');
   const [scope, setScope] = useState<ScopeType>('داخل المغرب');
@@ -30,7 +22,8 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
 
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    if (sending) return;
     e.preventDefault();
     setMessage(null);
 
@@ -71,12 +64,16 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
       status: 'pending',
     };
 
-    onAddDraft(newDraft);
-
-    setMessage({
-      text: 'تم حفظ الاقتراح بنجاح كمسودة محلية برقم (' + newDraft.id + '). يمكنك مراجعته أو اختباره في لوحة الإشراف!',
-      type: 'success',
-    });
+    setSending(true);
+    try {
+      const id = await submitOpportunity(newDraft);
+      setMessage({ text: 'تم استلام الاقتراح للمراجعة. رقم التتبع: ' + id, type: 'success' });
+    } catch {
+      setMessage({ text: 'تعذر إرسال الاقتراح. تحقق من الاتصال وإعداد الخدمة؛ قد يكون الرابط مقترحاً سابقاً. احتفظ بالمعلومات وحاول لاحقاً.', type: 'error' });
+      return;
+    } finally {
+      setSending(false);
+    }
 
     // Reset Form
     setTitle('');
@@ -107,18 +104,8 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
           </p>
         </div>
 
-        {/* Notice Banner: Simulation Notice */}
-        <div className="mb-10 p-5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200 flex items-start gap-4 shadow-sm">
-          <Info className="w-6 h-6 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
-          <div className="text-sm space-y-1">
-            <p className="font-bold">
-              توضيح مهم حول مرحلة المعاينة التجريبية (Preview Phase):
-            </p>
-            <p className="text-xs sm:text-sm text-amber-800 dark:text-amber-300 leading-relaxed">
-              هذا النموذج يحفظ اقتراحاتك في التخزين المحلي لمتصفحك فقط، ويتيح لك محاكاة مسار المراجعة والاعتماد في تبويب «لوحة الإشراف». 
-              في المرحلة القادمة، سيتم ربط قاعدة بيانات <span className="font-bold underline">Firebase Firestore</span> والمصادقة الآمنة لحفظ الاقتراحات ومراجعتها رسميًا من قبل مشرفي المنصة دون نشر أي رابط غير موثق.
-            </p>
-          </div>
+        <div role="status" className="mb-10 p-5 rounded-2xl bg-amber-50 text-amber-900 border border-amber-200 text-sm">
+          {firebaseConfigured ? 'تُرسل الاقتراحات إلى فريق المراجعة ولا تُنشر تلقائياً. لا تُدرج بيانات شخصية أو حساسة.' : 'استقبال الاقتراحات غير متاح حالياً. يمكنك تصفح الدليل إلى حين تفعيل الخدمة.'}
         </div>
 
         {/* 2-Column Grid: Form on Left, Review Flow & Drafts on Right */}
@@ -130,12 +117,13 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
               <span>استمارة اقتراح فرصة</span>
             </h3>
 
+            <button type="button" onClick={() => setOrganizer(SCOUT_ORGANIZATION)} className="mb-5 text-sm text-[#1667A5] dark:text-sky-300 font-bold underline">هذا نشاط لمنظمة الكشاف التطوعي — تعبئة اسم الجهة</button>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 mb-1.5">
                   عنوان الفرصة <span className="text-rose-500">*</span>
                 </label>
-                <input
+                <input aria-label="عنوان الفرصة"
                   type="text"
                   required
                   value={title}
@@ -150,7 +138,7 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
                   <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 mb-1.5">
                     الفئة <span className="text-rose-500">*</span>
                   </label>
-                  <select
+                  <select aria-label="الفئة"
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#0F2840] text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1667A5]"
@@ -160,6 +148,10 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
                     <option value="تكوين">تكوين</option>
                     <option value="أنشطة وفعاليات">أنشطة وفعاليات</option>
                     <option value="منح">منح ودعم</option>
+                    <option value="زمالة">زمالة</option>
+                    <option value="تدريب مهني">تدريب مهني</option>
+                    <option value="دورة تعليمية">دورة تعليمية</option>
+                    <option value="نشاط تنظيمي">نشاط تنظيمي</option>
                   </select>
                 </div>
 
@@ -167,7 +159,7 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
                   <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 mb-1.5">
                     النطاق الجغرافي <span className="text-rose-500">*</span>
                   </label>
-                  <select
+                  <select aria-label="النطاق"
                     value={scope}
                     onChange={(e) => setScope(e.target.value as ScopeType)}
                     className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#0F2840] text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-[#1667A5]"
@@ -184,7 +176,7 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
                   <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 mb-1.5">
                     الجهة المنظمة <span className="text-rose-500">*</span>
                   </label>
-                  <input
+                  <input aria-label="الجهة المنظمة"
                     type="text"
                     required
                     value={organizer}
@@ -198,7 +190,7 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
                   <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 mb-1.5">
                     المدينة أو المكان
                   </label>
-                  <input
+                  <input aria-label="المكان"
                     type="text"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
@@ -213,7 +205,7 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
                   <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 mb-1.5">
                     آخر أجل للتقديم (إن وُجد)
                   </label>
-                  <input
+                  <input aria-label="آخر أجل للتقديم"
                     type="text"
                     value={deadline}
                     onChange={(e) => setDeadline(e.target.value)}
@@ -226,7 +218,7 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
                   <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 mb-1.5">
                     التكاليف والدعم
                   </label>
-                  <input
+                  <input aria-label="التكلفة"
                     type="text"
                     value={cost}
                     onChange={(e) => setCost(e.target.value)}
@@ -240,7 +232,7 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
                 <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 mb-1.5">
                   الرابط الرسمي للإعلان أو التسجيل <span className="text-rose-500">*</span> <span className="text-slate-400 font-normal">(يجب أن يبدأ بـ https://)</span>
                 </label>
-                <input
+                <input aria-label="الرابط الرسمي"
                   type="url"
                   required
                   value={url}
@@ -255,7 +247,7 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
                 <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 mb-1.5">
                   شروط الأهلية والسن
                 </label>
-                <input
+                <input aria-label="شروط الأهلية"
                   type="text"
                   value={eligibility}
                   onChange={(e) => setEligibility(e.target.value)}
@@ -268,7 +260,7 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
                 <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 mb-1.5">
                   الوصف الكامل للفرصة <span className="text-rose-500">*</span>
                 </label>
-                <textarea
+                <textarea aria-label="وصف الفرصة"
                   required
                   rows={4}
                   value={description}
@@ -281,7 +273,7 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
               {/* Safety & Anti-Spam Checkbox */}
               <div className="pt-2">
                 <label className="flex items-start gap-3 cursor-pointer">
-                  <input
+                  <input aria-label="تأكيد صحة المعلومات"
                     type="checkbox"
                     checked={confirmed}
                     onChange={(e) => setConfirmed(e.target.checked)}
@@ -308,10 +300,11 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
 
               <button
                 type="submit"
+                disabled={sending || !firebaseConfigured}
                 className="w-full bg-[#259A6A] hover:bg-[#1E7D56] text-white py-3.5 px-6 rounded-xl font-bold text-sm sm:text-base shadow-md transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
               >
                 <PlusCircle className="w-5 h-5" />
-                <span>حفظ الاقتراح كمسودة محلية</span>
+                <span>{sending ? 'جارٍ الإرسال…' : 'إرسال الاقتراح للمراجعة'}</span>
               </button>
             </form>
           </div>
@@ -340,7 +333,7 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
                   <span className="w-6 h-6 rounded-full bg-[#1667A5] text-white font-bold flex items-center justify-center shrink-0 text-xs">2</span>
                   <div>
                     <strong className="text-slate-100 block">فحص آلي وفلترة:</strong>
-                    <span className="text-slate-300">التحقق من اكتمال الحقول، بروتوكول https، ومنع تكرار الروابط.</span>
+                    <span className="text-slate-300">التحقق من اكتمال الحقول وبروتوكول https، ومنع إعادة إرسال الرابط نفسه.</span>
                   </div>
                 </li>
                 <li className="flex items-start gap-3">
@@ -360,77 +353,14 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
                 <li className="flex items-start gap-3">
                   <span className="w-6 h-6 rounded-full bg-[#1667A5] text-white font-bold flex items-center justify-center shrink-0 text-xs">5</span>
                   <div>
-                    <strong className="text-slate-100 block">أرشفة تلقائية:</strong>
-                    <span className="text-slate-300">تُنقل الفرصة إلى الأرشيف بمجرد انقضاء موعد التقديم.</span>
+                    <strong className="text-slate-100 block">متابعة الصلاحية:</strong>
+                    <span className="text-slate-300">يراجع الفريق آجال التقديم؛ تأكد من صلاحية الإعلان لدى الجهة المنظمة.</span>
                   </div>
                 </li>
               </ol>
             </div>
 
-            {/* Local Drafts Card */}
-            <div className="bg-[#F5F8FC] dark:bg-[#15344F] p-6 rounded-3xl border border-slate-200 dark:border-[#23486A]">
-              <div className="flex items-center justify-between mb-4">
-                <h4 className="font-bold font-heading text-sm sm:text-base text-[#0F2840] dark:text-white flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-[#1667A5]" />
-                  <span>مسوداتك في هذا المتصفح ({drafts.length})</span>
-                </h4>
-                {drafts.length > 0 && (
-                  <span className="text-xs bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 px-2 py-0.5 rounded-full font-bold">
-                    مسودات محلية
-                  </span>
-                )}
-              </div>
 
-              {drafts.length === 0 ? (
-                <div className="text-center py-8 text-xs text-slate-400">
-                  <p>لا توجد مسودات محفوظة في هذا المتصفح حاليًا.</p>
-                  <p className="mt-1">املأ النموذج على اليمين لتجربة إرسال فرصة جديدة.</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {drafts.map((d) => (
-                    <div
-                      key={d.id}
-                      className="p-3.5 bg-white dark:bg-[#0F2840] rounded-xl border border-slate-200/80 dark:border-[#23486A] text-xs space-y-2"
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <strong className="text-slate-800 dark:text-white font-bold truncate">
-                          {d.title}
-                        </strong>
-                        <span className="text-[10px] font-mono text-slate-400 shrink-0">
-                          {d.id}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 text-[11px]">
-                        <span>{d.organizer} · {d.category}</span>
-                        <span className="px-2 py-0.5 rounded bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-semibold">
-                          قيد المراجعة
-                        </span>
-                      </div>
-                      <div className="pt-1 flex items-center justify-between">
-                        {onSimulateApprove && (
-                          <button
-                            type="button"
-                            onClick={() => onSimulateApprove(d)}
-                            className="text-[11px] font-bold text-[#259A6A] hover:underline"
-                          >
-                            اختبار الاعتماد الفوري في الدليل ←
-                          </button>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => onDeleteDraft(d.id)}
-                          className="text-rose-500 hover:text-rose-700 p-1"
-                          title="حذف المسودة"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
         </div>
       </div>
