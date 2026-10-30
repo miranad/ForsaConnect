@@ -110,3 +110,32 @@ test('Owner-managed roles enable the full workflow without claims; revocation an
  });
  await assertFails(getDocs(collection(db,'submissions')));
 });
+
+test('Only verified administrators can edit, withdraw and restore safe public catalog records', async () => {
+ const { sanitizeCatalogEdit } = await import('../../src/lib/catalogManagement');
+ const original = JSON.parse(readFileSync('src/data/opportunities.json','utf8'))[0];
+ const opportunity = sanitizeCatalogEdit(original);
+ await env.withSecurityRulesDisabled(async context => {
+   await setDoc(doc(context.firestore(),'administrators','reviewer'),{active:true});
+ });
+ const db = env.authenticatedContext('reviewer',{email_verified:true}).firestore();
+ const ref = doc(db,'catalogEdits',opportunity.id);
+ const payload = {opportunity,visible:true,updatedBy:'reviewer',updatedAt:serverTimestamp()};
+ await assertFails(setDoc(doc(visitor(),'catalogEdits',opportunity.id),{...payload,updatedBy:'visitor'}));
+ await assertFails(setDoc(doc(env.authenticatedContext('reviewer',{email_verified:false}).firestore(),'catalogEdits',opportunity.id),payload));
+ await assertSucceeds(setDoc(ref,payload));
+ await assertSucceeds(getDoc(doc(guest(),'catalogEdits',opportunity.id)));
+ for (const patch of [{opportunity:{...opportunity,submittedBy:'private'}},{opportunity:{...opportunity,source_url:'http://example.org'}},{updatedBy:'someone-else'},{updatedAt:new Date(0)},{visible:'true'}]) {
+   await assertFails(setDoc(ref,{...payload,...patch}));
+ }
+ await assertSucceeds(setDoc(ref,{...payload,visible:false}));
+ assert.equal((await getDoc(ref)).data()?.visible,false);
+ await assertSucceeds(setDoc(ref,{...payload,opportunity:{...opportunity,title_ar:'عنوان مصحح بعد مراجعة المصدر'}}));
+ assert.equal((await getDoc(ref)).data()?.visible,true);
+ await assertFails(deleteDoc(ref));
+ await assertFails(updateDoc(doc(db,'administrators','reviewer'),{active:true}));
+ await env.withSecurityRulesDisabled(async context => {
+   await updateDoc(doc(context.firestore(),'administrators','reviewer'),{active:false});
+ });
+ await assertFails(setDoc(ref,payload));
+});

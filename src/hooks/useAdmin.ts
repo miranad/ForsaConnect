@@ -7,6 +7,7 @@ import { adminRoleRef } from '../lib/adminAccess';
 export function useAdmin() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(Boolean(auth));
+  const [email, setEmail] = useState<string | null>(null);
   useEffect(() => {
     if (!auth) return;
     let generation = 0;
@@ -15,6 +16,7 @@ export function useAdmin() {
       const current = ++generation;
       stopRole(); stopRole = () => {};
       setIsAdmin(false);
+      setEmail(user?.email ?? null);
       setLoading(true);
       try {
         const token = user ? await user.getIdTokenResult() : null;
@@ -32,5 +34,5 @@ export function useAdmin() {
     });
     return () => { generation++; stopRole(); stop(); };
   }, []);
-  return { isAdmin, loading, logout: () => auth ? signOut(auth) : Promise.resolve() };
+  return { isAdmin, loading, email, logout: () => auth ? signOut(auth) : Promise.resolve() };
 }

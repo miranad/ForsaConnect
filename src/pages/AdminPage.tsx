@@ -8,6 +8,9 @@ import { watchSubmissions, reviewSubmission } from '../lib/submissions';
 import type { Submission, ReviewStatus } from '../lib/moderation';
 import { asOfficialUrl } from '../lib/catalog';
 import { hasAdminAccess } from '../lib/adminAccess';
+import { CatalogManager } from '../components/CatalogManager';
+import type { CatalogEdit } from '../lib/catalogManagement';
+import type { Opportunity } from '../types';
 
 const labels: Record<ReviewStatus, string> = { pending: 'قيد المراجعة', approved: 'معتمد ولم يُنشر', rejected: 'مرفوض', published: 'منشور' };
 const fieldClass = 'w-full min-w-0 p-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#15344F]';
@@ -35,9 +38,9 @@ function ReviewCard({ draft, busy, action }: { draft: Submission; busy: boolean;
     </> : <p className="text-sm whitespace-pre-wrap break-words">ملاحظات المراجعة: {draft.adminNotes}</p>}
   </article>;
 }
-export const AdminPage: React.FC = () => {
+export const AdminPage: React.FC<{ catalog: Opportunity[]; edits: CatalogEdit[] }> = ({ catalog, edits }) => {
   const { navigate } = useRouter();
-  const { isAdmin, loading, logout } = useAdmin();
+  const { isAdmin, loading, logout, email: signedInEmail } = useAdmin();
   const [drafts, setDrafts] = useState<Submission[]>([]);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -111,11 +114,13 @@ export const AdminPage: React.FC = () => {
         <label className="block space-y-2"><span>كلمة المرور</span><input dir="ltr" className={fieldClass} type="password" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} /></label>
         <button className={buttonClass} type="submit" disabled={busy || !authReady}>{busy ? 'جارٍ التحقق…' : 'تسجيل الدخول'}</button>
       </form> : <>
-        <div className="flex flex-wrap gap-3 items-center justify-between"><p>الاعتماد يسبق النشر. ملاحظات المراجعة لا تظهر للزوار.</p><button type="button" className={buttonClass} onClick={() => { void logout().catch(() => setMessage('تعذر تسجيل الخروج. حاول مجدداً.')); }}>تسجيل الخروج</button></div>
+        <p className="text-sm break-all" dir="ltr">{signedInEmail}</p>
+        <div className="flex flex-wrap gap-3 items-center justify-between"><p>الاعتماد يسبق النشر. ملاحظات المراجعة لا تظهر للزوار.</p><button type="button" className={buttonClass} onClick={() => navigate('submit')}>إضافة فرصة جديدة</button><button type="button" className={buttonClass} onClick={() => { void logout().catch(() => setMessage('تعذر تسجيل الخروج. حاول مجدداً.')); }}>تسجيل الخروج</button></div>
         <label className="block max-w-sm space-y-2"><span>حالة الاقتراحات</span><select className={fieldClass} value={filter} onChange={e => setFilter(e.target.value as ReviewStatus)}>{Object.entries(labels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
         <p className="text-sm">تعرض القائمة حتى 200 اقتراح. اختر الحالة لمتابعة المراجعة.</p>
         {drafts.filter(d => d.status === filter).map(d => <ReviewCard key={d.id + d.status} draft={d} busy={busy} action={action} />)}
         {!drafts.some(d => d.status === filter) && <p role="status">لا توجد اقتراحات في هذه الحالة.</p>}
+        <CatalogManager catalog={catalog} edits={edits} />
       </>}
   </div></div>;
 };

@@ -12,8 +12,10 @@ import { AboutPage } from './pages/AboutPage';
 import { ContactPage } from './pages/ContactPage';
 import rawOpportunities from './data/opportunities.json';
 import { Opportunity } from './types';
-import { watchPublished } from './lib/submissions';
+import { watchPublished, watchCatalogEdits } from './lib/submissions';
 import { activeOpportunities } from './lib/deadlines';
+import { mergeCatalog, type CatalogEdit } from './lib/catalogManagement';
+import { firebaseConfigured } from './lib/firebase';
 
 const INITIAL_OPPORTUNITIES: Opportunity[] = rawOpportunities as Opportunity[];
 
@@ -22,6 +24,9 @@ function MainAppContent() {
 
   const [customOpportunities, setCustomOpportunities] = useState<Opportunity[]>([]);
   const [catalogError, setCatalogError] = useState(false);
+  const [edits, setEdits] = useState<CatalogEdit[]>([]);
+  const [editsReady, setEditsReady] = useState(!firebaseConfigured);
+  const [editsError, setEditsError] = useState(false);
   const [clock, setClock] = useState(() => new Date());
   useEffect(() => {
     const refresh = () => setClock(new Date());
@@ -30,11 +35,12 @@ function MainAppContent() {
     return () => { window.clearInterval(timer); window.removeEventListener('focus', refresh); };
   }, []);
   useEffect(() => watchPublished(ops => { setCustomOpportunities(ops); setCatalogError(false); }, () => setCatalogError(true)), []);
+  useEffect(() => watchCatalogEdits(value => { setEdits(value); setEditsReady(true); setEditsError(false); }, () => setEditsError(true)), []);
 
   // Combined opportunities pool
   const allOpportunities = useMemo(() => {
-    return activeOpportunities([...customOpportunities, ...INITIAL_OPPORTUNITIES], clock);
-  }, [customOpportunities, clock]);
+    return editsReady ? activeOpportunities(mergeCatalog([...customOpportunities, ...INITIAL_OPPORTUNITIES], edits), clock) : [];
+  }, [customOpportunities, edits, editsReady, clock]);
 
   // Scope count calculations
   const moroccoCount = useMemo(() => allOpportunities.filter((x) => x.scope === 'داخل المغرب').length, [allOpportunities]);
@@ -46,7 +52,7 @@ function MainAppContent() {
       <Navbar draftCount={0} />
 
       <main className="flex-1">
-        {catalogError && <p role="status" className="p-3 text-center bg-amber-50 text-amber-900">تعذر تحديث الفرص الجديدة. يمكنك تصفح الفرص المتاحة والمحاولة لاحقاً.</p>}
+        {(catalogError || editsError) && <p role="status" className="p-3 text-center bg-amber-50 text-amber-900">تعذر تحديث دليل الفرص. تحقق من الاتصال وحاول مجدداً.</p>}
         {route.page === 'home' && (
           <HomePage
             opportunities={allOpportunities}
@@ -76,7 +82,7 @@ function MainAppContent() {
         )}
 
         {route.page === 'admin' && (
-          <AdminPage />
+          <AdminPage catalog={[...customOpportunities, ...INITIAL_OPPORTUNITIES]} edits={edits} />
         )}
 
         {route.page === 'verification' && <VerificationPage />}
