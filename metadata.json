@@ -1,0 +1,6 @@
+{
+  "name": "ForsaConnect | طريقك نحو الفرص",
+  "description": "منصة مغربية غير ربحية تجمع فرص التطوع والتكوين والورشات والمنح للشباب المغربي من المصادر الرسمية.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
