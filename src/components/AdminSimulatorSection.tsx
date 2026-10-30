@@ -234,7 +234,7 @@ export const AdminSimulatorSection: React.FC<AdminSimulatorSectionProps> = ({
               <div className="p-4 bg-[#0A1D30] rounded-2xl border border-[#23486A] space-y-2">
                 <span className="font-bold text-indigo-300 block">4. التكلفة التقديرية (Firebase Spark Plan):</span>
                 <p className="text-slate-300 text-xs leading-relaxed">
-                  الخطة المجانية تتيح 50,000 قراءة و20,000 كتابة يومياً، وهي كافية تماماً لمنصة ForsaConnect دون أي تكاليف سحابية إضافية (0.00$).
+                  قد تتوفر حصص مجانية ضمن خطة Firebase Spark وفق الشروط السارية. حدود الاستخدام وتكاليف الاستضافة والخدمات الأخرى تتغير؛ يجب مراجعة التسعير الرسمي قبل تفعيل أي خدمة سحابية. لم تُفعّل قاعدة بيانات حقيقية بعد.
                 </p>
               </div>
             </div>

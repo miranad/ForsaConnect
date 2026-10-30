@@ -132,8 +132,11 @@ export const OpportunityDetailPage: React.FC<OpportunityDetailPageProps> = ({ op
                   <span className={statusStyle.text}>حالة التوثيق: {statusStyle.label}</span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
-                  تاريخ مراجعة الرابط الرسمي: <span className="font-bold text-slate-800 dark:text-slate-200">{opportunity.verified_on}</span>. 
-                  الأصل الرسمي لا يضمن فتح التسجيل حالياً دون مراجعة مستقلة؛ يرجى زيارة الرابط والتأكد من الجهة المعلنة.
+                  {opportunity.isCustom ? (
+                    <>تاريخ إدخال الاقتراح التجريبي: <span className="font-bold text-slate-800 dark:text-slate-200">{opportunity.verified_on}</span>. لم يتم التحقق بشكل مستقل من هذا الاقتراح أو من فتح التسجيل.</>
+                  ) : (
+                    <>تاريخ مراجعة المصدر: <span className="font-bold text-slate-800 dark:text-slate-200">{opportunity.verified_on}</span>. وجود رابط رسمي لا يعني استمرار فتح التسجيل؛ يُرجى التأكد من الجهة المنظمة.</>
+                  )}
                 </p>
               </div>
             </div>

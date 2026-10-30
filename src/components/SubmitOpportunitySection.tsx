@@ -46,7 +46,7 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
       setMessage({ text: 'يرجى كتابة وصف تفصيلي للفرصة لا يقل عن 15 حرفاً.', type: 'error' });
       return;
     }
-    if (url.trim() && !asOfficialUrl(url.trim())) {
+    if (!asOfficialUrl(url.trim())) {
       setMessage({ text: 'الرابط الرسمي يجب أن يكون عنوان ويب صالحاً ويبدأ بـ https://', type: 'error' });
       return;
     }
@@ -56,7 +56,7 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
     }
 
     const newDraft: SubmissionDraft = {
-      id: 'FC-PROP-' + Math.floor(1000 + Math.random() * 9000),
+      id: 'FC-PROP-' + crypto.randomUUID(),
       title: title.trim(),
       category,
       scope,
@@ -238,10 +238,11 @@ export const SubmitOpportunitySection: React.FC<SubmitOpportunitySectionProps> =
 
               <div>
                 <label className="block text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 mb-1.5">
-                  الرابط الرسمي للإعلان أو التسجيل <span className="text-slate-400 font-normal">(يجب أن يبدأ بـ https://)</span>
+                  الرابط الرسمي للإعلان أو التسجيل <span className="text-rose-500">*</span> <span className="text-slate-400 font-normal">(يجب أن يبدأ بـ https://)</span>
                 </label>
                 <input
                   type="url"
+                  required
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   placeholder="https://example.org/opportunity"

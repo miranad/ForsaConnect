@@ -115,9 +115,12 @@ export function filterOpportunities(
 
     // City filter
     if (city !== 'الكل') {
-      if (city === 'خارج المغرب' && item.scope !== 'خارج المغرب') return false;
-      if (city === 'عن بعد' && item.scope !== 'عن بعد') return false;
-      if (item.scope === 'داخل المغرب' && !item.location.includes(city)) return false;
+      if (city === 'خارج المغرب' || city === 'عن بعد') {
+        if (item.scope !== city) return false;
+      } else {
+        // A Moroccan city must never match international or remote opportunities.
+        if (item.scope !== 'داخل المغرب' || !item.location.includes(city)) return false;
+      }
     }
 
     // Query filter

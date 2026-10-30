@@ -93,7 +93,7 @@ export const OpportunitiesPage: React.FC<OpportunitiesPageProps> = ({
           <ShieldCheck className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
           <div>
             <p className="font-bold">
-              تاريخ التحقق في الملف: 29-10-2026. Only source-verified listings; confirmation of remaining places is not guaranteed.
+              تاريخ مراجعة المصادر في الملف: 29-10-2026. وجود رابط رسمي لا يعني أن باب التسجيل ما زال مفتوحاً أو أن المقاعد متاحة؛ يُرجى التأكد من الجهة المنظمة قبل التقديم.
             </p>
             <p className="text-xs text-amber-800 dark:text-amber-300 mt-1">
               لا توجد فرص منح في الملف البحثي الحالي، ولذلك لا يظهر مرشح «منح» حتى تُضاف سجلات رسمية معتمدة.
