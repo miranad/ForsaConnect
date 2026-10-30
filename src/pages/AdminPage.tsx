@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { browserSessionPersistence, setPersistence, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { browserSessionPersistence, setPersistence, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, type User } from 'firebase/auth';
 import { Home, ShieldCheck } from 'lucide-react';
 import { useRouter } from '../context/RouterContext';
 import { auth, firebaseConfigured } from '../lib/firebase';
@@ -42,24 +42,52 @@ export const AdminPage: React.FC = () => {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
+  const [authReady, setAuthReady] = useState(false);
   const [filter, setFilter] = useState<ReviewStatus>('pending');
+  useEffect(() => {
+    let active = true;
+    if (auth) void setPersistence(auth, browserSessionPersistence).then(() => {
+      if (active) setAuthReady(true);
+    }).catch(() => {
+      if (active) setMessage('تعذر تهيئة جلسة الدخول. اسمح بتخزين بيانات الموقع ثم أعد تحميل الصفحة.');
+    });
+    return () => { active = false; };
+  }, []);
   useEffect(() => {
     setDrafts([]);
     if (!isAdmin) return;
     return watchSubmissions(filter, setDrafts, () => { setDrafts([]); setMessage('تعذر تحميل قائمة المراجعة. تحقق من الصلاحيات والاتصال.'); });
   }, [isAdmin, filter]);
+  async function requireAdmin(user: User) {
+    const token = await user.getIdTokenResult(true);
+    if (!user.emailVerified || token.claims.admin !== true) {
+      if (auth) await signOut(auth);
+      setMessage('تم التحقق من حسابك، لكنه غير مخول للإشراف. تواصل مع مسؤول المنصة لتفعيل الصلاحية.');
+    }
+  }
+  async function googleLogin() {
+    if (!auth || busy || !authReady) return;
+    setBusy(true); setMessage('');
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      // Start the popup directly from the click; persistence is prepared above.
+      const result = await signInWithPopup(auth, provider);
+      await requireAdmin(result.user);
+    } catch (error) {
+      const code = (error as { code?: string }).code;
+      if (code === 'auth/popup-blocked') setMessage('اسمح بفتح نافذة تسجيل الدخول ثم اضغط على زر Google مجدداً.');
+      else if (code !== 'auth/popup-closed-by-user' && code !== 'auth/cancelled-popup-request') setMessage('تعذر الدخول باستخدام Google. تحقق من الاتصال وإعداد الخدمة أو استخدم البريد وكلمة المرور.');
+    } finally { setBusy(false); }
+  }
   async function login(e: React.FormEvent) {
     e.preventDefault();
-    if (!auth || busy) return;
+    if (!auth || busy || !authReady) return;
     setBusy(true); setMessage('');
     try {
       await setPersistence(auth, browserSessionPersistence);
       const result = await signInWithEmailAndPassword(auth, email.trim(), password);
-      const token = await result.user.getIdTokenResult(true);
-      if (!result.user.emailVerified || token.claims.admin !== true) {
-        await signOut(auth);
-        setMessage('هذا الحساب غير مخول للإشراف أو لم يؤكد بريده الإلكتروني.');
-      }
+      await requireAdmin(result.user);
     } catch { setMessage('تعذر تسجيل الدخول. تحقق من البيانات والاتصال وصلاحية الحساب.'); }
     finally { setPassword(''); setBusy(false); }
   }
@@ -77,9 +105,11 @@ export const AdminPage: React.FC = () => {
     {!firebaseConfigured ? <p className={fieldClass}>دخول المشرف غير متاح إلى حين تفعيل الخدمة.</p> : loading ? <p role="status">جارٍ التحقق من الجلسة…</p> : !isAdmin ?
       <form onSubmit={login} className="max-w-md space-y-5 p-6 bg-white dark:bg-[#0F2840] rounded-3xl border border-slate-200 dark:border-[#23486A]">
         <p>تسجيل دخول المشرفين المعتمدين فقط.</p>
+        <button className={buttonClass + ' w-full'} type="button" disabled={busy || !authReady} onClick={() => void googleLogin()}>الدخول باستخدام Google</button>
+        <p className="text-sm text-slate-600 dark:text-slate-300">استخدم حساب Google المعتمد لدى المنصة، أو سجّل الدخول بالبريد وكلمة المرور أدناه. تسجيل الدخول وحده لا يمنح صلاحية الإشراف.</p>
         <label className="block space-y-2"><span>البريد الإلكتروني</span><input dir="ltr" className={fieldClass} type="email" autoComplete="username" required value={email} onChange={e => setEmail(e.target.value)} /></label>
         <label className="block space-y-2"><span>كلمة المرور</span><input dir="ltr" className={fieldClass} type="password" autoComplete="current-password" required value={password} onChange={e => setPassword(e.target.value)} /></label>
-        <button className={buttonClass} type="submit" disabled={busy}>{busy ? 'جارٍ التحقق…' : 'تسجيل الدخول'}</button>
+        <button className={buttonClass} type="submit" disabled={busy || !authReady}>{busy ? 'جارٍ التحقق…' : 'تسجيل الدخول'}</button>
       </form> : <>
         <div className="flex flex-wrap gap-3 items-center justify-between"><p>الاعتماد يسبق النشر. ملاحظات المراجعة لا تظهر للزوار.</p><button type="button" className={buttonClass} onClick={() => { void logout().catch(() => setMessage('تعذر تسجيل الخروج. حاول مجدداً.')); }}>تسجيل الخروج</button></div>
         <label className="block max-w-sm space-y-2"><span>حالة الاقتراحات</span><select className={fieldClass} value={filter} onChange={e => setFilter(e.target.value as ReviewStatus)}>{Object.entries(labels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
