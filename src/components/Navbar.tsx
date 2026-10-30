@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, Compass, PlusCircle, ShieldCheck, HelpCircle, Users, Mail, Sparkles, Home } from 'lucide-react';
+import { Menu, X, Compass, PlusCircle, ShieldCheck, HelpCircle, Users, Mail, Home } from 'lucide-react';
 import { PageType, useRouter } from '../context/RouterContext';
 
 interface NavbarProps {
@@ -30,11 +30,6 @@ export const Navbar: React.FC<NavbarProps> = ({ draftCount }) => {
       {/* Top Banner: Verification Notice */}
       <div className="bg-[#1667A5] text-xs text-white/95 py-1.5 px-4 text-center font-medium border-b border-blue-400/20">
         <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 flex-wrap">
-          <span className="inline-flex items-center gap-1 font-bold text-emerald-300">
-            <Sparkles className="w-3.5 h-3.5" />
-            النسخة 3 المعتمدة
-          </span>
-          <span className="text-white/60">|</span>
           <span>فرص تطوع وتكوين وأنشطة للشباب من مصادرها الرسمية.</span>
           <span className="hidden sm:inline text-white/60">|</span>
           <span className="hidden sm:inline text-white/90">يُرجى مراجعة الموقع الرسمي قبل إرسال طلبك.</span>
@@ -62,9 +57,6 @@ export const Navbar: React.FC<NavbarProps> = ({ draftCount }) => {
               <div className="flex items-center gap-2">
                 <span className="text-xl sm:text-2xl font-black font-heading tracking-wide text-white">
                   Forsa<span className="text-[#259A6A]">Connect</span>
-                </span>
-                <span className="text-[11px] font-semibold bg-[#259A6A]/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full">
-                  النسخة 3
                 </span>
               </div>
               <p className="text-xs text-slate-300 font-normal">«طريقك نحو الفرص» · منصة شبابية غير ربحية</p>
