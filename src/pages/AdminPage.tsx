@@ -7,6 +7,7 @@ import { useAdmin } from '../hooks/useAdmin';
 import { watchSubmissions, reviewSubmission } from '../lib/submissions';
 import type { Submission, ReviewStatus } from '../lib/moderation';
 import { asOfficialUrl } from '../lib/catalog';
+import { hasAdminAccess } from '../lib/adminAccess';
 
 const labels: Record<ReviewStatus, string> = { pending: 'قيد المراجعة', approved: 'معتمد ولم يُنشر', rejected: 'مرفوض', published: 'منشور' };
 const fieldClass = 'w-full min-w-0 p-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-[#15344F]';
@@ -59,8 +60,7 @@ export const AdminPage: React.FC = () => {
     return watchSubmissions(filter, setDrafts, () => { setDrafts([]); setMessage('تعذر تحميل قائمة المراجعة. تحقق من الصلاحيات والاتصال.'); });
   }, [isAdmin, filter]);
   async function requireAdmin(user: User) {
-    const token = await user.getIdTokenResult(true);
-    if (!user.emailVerified || token.claims.admin !== true) {
+    if (!await hasAdminAccess(user)) {
       if (auth) await signOut(auth);
       setMessage('تم التحقق من حسابك، لكنه غير مخول للإشراف. تواصل مع مسؤول المنصة لتفعيل الصلاحية.');
     }

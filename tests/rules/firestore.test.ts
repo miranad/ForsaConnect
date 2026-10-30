@@ -84,3 +84,29 @@ test('Actual application persistence and transaction functions complete the full
  if (!published.exists() || published.data().opportunity.title_ar !== fields.title) throw new Error('Published data mismatch');
  await assert.rejects(transitionSubmission(asDb(admin()),'reviewer',actualId,'published','duplicate publication'));
 });
+
+test('Owner-managed roles enable the full workflow without claims; revocation and verification are enforced', async () => {
+ await env.withSecurityRulesDisabled(async context => {
+   await setDoc(doc(context.firestore(),'administrators','reviewer'),{active:true});
+ });
+ const db = env.authenticatedContext('reviewer',{email_verified:true}).firestore();
+ const unverified = env.authenticatedContext('reviewer',{email_verified:false}).firestore();
+ await submit();
+ await assertFails(getDoc(doc(unverified,'submissions',id)));
+ await assertSucceeds(getDoc(doc(db,'administrators','reviewer')));
+ await assertFails(getDocs(collection(db,'administrators')));
+ await assertFails(getDoc(doc(visitor(),'administrators','reviewer')));
+ await assertFails(setDoc(doc(visitor(),'administrators','visitor'),{active:true}));
+ await assertFails(updateDoc(doc(db,'administrators','reviewer'),{active:false}));
+ await assertFails(deleteDoc(doc(db,'administrators','reviewer')));
+ const { transitionSubmission } = await import('../../src/lib/moderationStore');
+ const asDb = db as unknown as import('firebase/firestore').Firestore;
+ await assertSucceeds(transitionSubmission(asDb,'reviewer',id,'approved','تم فحص المصدر'));
+ assert.equal((await getDoc(doc(guest(),'publishedOpportunities',id))).exists(),false);
+ await assertSucceeds(transitionSubmission(asDb,'reviewer',id,'published','اعتماد النشر النهائي'));
+ await assertSucceeds(getDoc(doc(guest(),'publishedOpportunities',id)));
+ await env.withSecurityRulesDisabled(async context => {
+   await updateDoc(doc(context.firestore(),'administrators','reviewer'),{active:false});
+ });
+ await assertFails(getDocs(collection(db,'submissions')));
+});
